@@ -25,6 +25,8 @@ public class EstudianteView extends JFrame {
     private JTable                 tblResultados;
     private DefaultTableModel      modeloTabla;
     private JLabel                 lblEstado;
+    private JButton                btningresar;
+    private JButton                btnBuscar2;
 
     // ── Controlador ───────────────────────────────────────────────────────────
     private EstudianteController controlador;
@@ -47,18 +49,26 @@ public class EstudianteView extends JFrame {
 
         // Panel superior — barra de búsqueda
         JPanel panelBusqueda = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        JPanel panelBusqueda2 = new JPanel (new FlowLayout(FlowLayout.LEFT, 10, 10));
         panelBusqueda.setBorder(BorderFactory.createTitledBorder("Buscar estudiante"));
-
+        panelBusqueda2.setBorder(BorderFactory.createTitledBorder("Añadir estudiante"));
+        
         JLabel lblNombre = new JLabel("Nombre:");
         txtNombre = new JTextField(25);
         btnBuscar = new JButton("Buscar");
         btnBuscar.setBackground(new Color(59, 139, 212));
         btnBuscar.setForeground(Color.WHITE);
         btnBuscar.setFocusPainted(false);
+        
+        btnBuscar2 = new JButton("Agregar");
+        btnBuscar2.setBackground(new Color(59, 139, 212));
+        btnBuscar2.setForeground(Color.WHITE);
+        btnBuscar2.setFocusPainted(false);
 
         panelBusqueda.add(lblNombre);
         panelBusqueda.add(txtNombre);
         panelBusqueda.add(btnBuscar);
+        panelBusqueda.add(btnBuscar2);
 
         // Panel central — tabla de resultados
         String[] columnas = {"ID", "Nombre", "Carrera", "Promedio"};
@@ -112,6 +122,11 @@ public class EstudianteView extends JFrame {
         setEstado("Se encontró 1 estudiante.");
     }
 
+      public void mostrarConfirmacion(Object[] fila) {
+        limpiarTabla();
+        agregarFila(fila);
+        setEstado("Se encontró 1 estudiante.");
+    }
     /**
      * Muestra varias filas en la tabla.
      * @param filas lista de arreglos {id, nombre, carrera, promedioFormateado}
