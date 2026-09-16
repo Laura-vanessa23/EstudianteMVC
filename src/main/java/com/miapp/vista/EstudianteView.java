@@ -21,6 +21,8 @@ public class EstudianteView extends JFrame {
 
     // ── Componentes UI ────────────────────────────────────────────────────────
     private JTextField             txtNombre;
+    private JTextField             txtCarrera;   // <-- NUEVO: Para la carrera
+    private JTextField             txtPromedio;  // <-- NUEVO: Para el promedio
     private JButton                btnBuscar;
     private JTable                 tblResultados;
     private DefaultTableModel      modeloTabla;
@@ -60,6 +62,8 @@ public class EstudianteView extends JFrame {
         btnBuscar.setForeground(Color.WHITE);
         btnBuscar.setFocusPainted(false);
         
+        JLabel lblagregar = new JLabel("Nombre:");
+        txtNombre = new JTextField(25);
         btnBuscar2 = new JButton("Agregar");
         btnBuscar2.setBackground(new Color(59, 139, 212));
         btnBuscar2.setForeground(Color.WHITE);
@@ -151,6 +155,11 @@ public class EstudianteView extends JFrame {
         setEstado("Error: " + mensaje);
     }
 
+    public void mostrarConfirmacion(String mensaje) {
+    javax.swing.JOptionPane.showMessageDialog(this, mensaje, "Éxito", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+}
+    
+    
     /**
      * Devuelve el texto ingresado en el campo de nombre.
      */

@@ -120,5 +120,39 @@ public class EstudianteController {
         return filas;
     }
 
+    public void agregarEstudiante(String nombre, String carrera, double promedio) {
+    
+    // 1. Validación: Verificar que el nombre no esté vacío (usando trim para evitar espacios en blanco)
+    if (nombre == null || nombre.trim().isEmpty()) {
+        vista.mostrarError("Por favor ingrese un nombre válido.");
+        return;
+    }
+
+    // 2. Validación: Verificar que la carrera no esté vacía
+    if (carrera == null || carrera.trim().isEmpty()) {
+        vista.mostrarError("Por favor ingrese una carrera.");
+        return;
+    }
+
+    // 3. Validación: Verificar que el promedio esté en el rango permitido (0.0 a 5.0)
+    if (promedio < 0.0 || promedio > 5.0) {
+        vista.mostrarError("El promedio debe estar entre 0.0 y 5.0.");
+        return;
+    }
+
+   int nuevoId = estudiantes.size() + 1; 
+
+
+    Estudiante nuevoEstudiante = new Estudiante(nuevoId, nombre, carrera, promedio);
+   
+    estudiantes.add(nuevoEstudiante);
+
+    //  Actualizamos la interfaz: Mostramos un mensaje de éxito (si tu vista lo tiene)
+    // y refrescamos la tabla con toda la lista actualizada
+    vista.mostrarConfirmacion("Estudiante agregado con éxito.");
+    
+    // Convertimos toda la lista a filas para que la tabla de la vista se redibuje
+    vista.mostrarEstudiantes(convertirAFilas(estudiantes));
+}
    
 }
