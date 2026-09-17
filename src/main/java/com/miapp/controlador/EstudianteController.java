@@ -5,6 +5,7 @@ import com.miapp.vista.EstudianteView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -25,6 +26,10 @@ public class EstudianteController {
     // ── Array de estudiantes (fuente de datos) ────────────────────────────────
     private ArrayList<Estudiante> estudiantes;
 
+    // ── Memoria para ordenamiento (Enunciado 2) ──────────────────────────────
+    private List<Estudiante> ultimosResultados = new ArrayList<>();
+    private boolean ordenAscendente = true;
+
     // ── Constructor ───────────────────────────────────────────────────────────
 
     public EstudianteController(EstudianteView vista) {
@@ -41,19 +46,21 @@ public class EstudianteController {
      */
     private void cargarDatos() {
         estudiantes = new ArrayList<Estudiante> (Arrays.asList(
-            new Estudiante(1,  "Ana García",        "Ingeniería de Sistemas",  4.5),
-            new Estudiante(2,  "Carlos López",      "Ingeniería Civil",        3.8),
-            new Estudiante(3,  "María Rodríguez",   "Medicina",                4.9),
-            new Estudiante(4,  "José Martínez",     "Derecho",                 3.5),
-            new Estudiante(5,  "Laura Sánchez",     "Administración",          4.1),
-            new Estudiante(6,  "Andrés Torres",     "Ingeniería de Sistemas",  3.9),
-            new Estudiante(7,  "Valentina Gómez",   "Psicología",              4.3),
-            new Estudiante(8,  "Luis Herrera",      "Economía",                3.7),
-            new Estudiante(9,  "Sofía Díaz",        "Ingeniería Civil",        4.6),
-            new Estudiante(10, "Juliana Morales",   "Medicina",                4.8),
-            new Estudiante(11, "Ana Milena Ruiz",   "Derecho",                 4.0),
-            new Estudiante(12, "Carlos Andrés Paz", "Administración",          3.6)
+            new Estudiante(1,  "Ana García",        "Ingeniería de Sistemas",   4.5),
+            new Estudiante(2,  "Carlos López",      "Ingeniería Civil",         3.8),
+            new Estudiante(3,  "María Rodríguez",   "Medicina",                 4.9),
+            new Estudiante(4,  "José Martínez",     "Derecho",                  3.5),
+            new Estudiante(5,  "Laura Sánchez",     "Administración",           4.1),
+            new Estudiante(6,  "Andrés Torres",     "Ingeniería de Sistemas",   3.9),
+            new Estudiante(7,  "Valentina Gómez",   "Psicología",               4.3),
+            new Estudiante(8,  "Luis Herrera",      "Economía",                 3.7),
+            new Estudiante(9,  "Sofía Díaz",        "Ingeniería Civil",         4.6),
+            new Estudiante(10, "Juliana Morales",   "Medicina",                 4.8),
+            new Estudiante(11, "Ana Milena Ruiz",   "Derecho",                  4.0),
+            new Estudiante(12, "Carlos Andrés Paz", "Administración",           3.6)
         ));
+        // Inicializamos los últimos resultados con todos los datos por defecto
+        ultimosResultados = new ArrayList<>(estudiantes);
     }
 
     // ── Lógica de búsqueda ────────────────────────────────────────────────────
@@ -82,6 +89,10 @@ public class EstudianteController {
             }
         }
 
+        // Guardamos los resultados actuales en la memoria para el ordenamiento
+        ultimosResultados = new ArrayList<>(resultados);
+        ordenAscendente = true; // Reiniciamos el sentido al hacer una nueva búsqueda
+
         if (resultados.isEmpty()) {
             vista.mostrarEstudiantes(new ArrayList<>()); // mostrará mensaje vacío
         } else if (resultados.size() == 1) {
@@ -91,6 +102,54 @@ public class EstudianteController {
             // Varios resultados: se convierte toda la lista antes de enviarla a la Vista
             vista.mostrarEstudiantes(convertirAFilas(resultados));
         }
+    }
+
+    // ── Lógica de ordenamiento (Enunciado 2) ──────────────────────────────────
+
+    /**
+     * Ordena los últimos resultados mostrados en pantalla según el criterio y alterna
+     * el sentido entre ascendente y descendente en cada ejecución.
+     *
+     * @param criterio campo por el cual ordenar ("Nombre" o "Promedio")
+     */
+   public void ordenarPor(String criterio) {
+        if (ultimosResultados == null || ultimosResultados.isEmpty()) {
+            vista.mostrarError("No hay resultados previos para ordenar. Realice una búsqueda primero.");
+            return;
+        }
+
+        if (criterio.equals("Nombre")) {
+            if (ordenAscendente) {
+                ultimosResultados.sort(Comparator.comparing(Estudiante::getNombre));
+            } else {
+                ultimosResultados.sort(Comparator.comparing(Estudiante::getNombre).reversed());
+            }
+        } 
+        else if (criterio.equals("Promedio")) {
+            if (ordenAscendente) {
+                ultimosResultados.sort(Comparator.comparing(Estudiante::getPromedio));
+            } else {
+                ultimosResultados.sort(Comparator.comparing(Estudiante::getPromedio).reversed());
+            }
+        }
+
+        ordenAscendente = !ordenAscendente;
+        vista.mostrarEstudiantes(convertirAFilas(ultimosResultados));
+    }
+   
+   // ── Lógica para mostrar todos (Enunciado 3) ───────────────────────────────
+
+    /**
+     * Obtiene el listado completo de estudiantes, actualiza la memoria de 
+     * últimos resultados y los muestra en la vista.
+     */
+    public void mostrarTodos() {
+        // Guardamos todos los estudiantes en la memoria de ordenamiento
+        ultimosResultados = new ArrayList<>(estudiantes);
+        ordenAscendente = true; // Reiniciamos el sentido del orden
+
+        // Enviamos la lista completa convertida a filas para que la vista la pinte
+        vista.mostrarEstudiantes(convertirAFilas(estudiantes));
     }
 
     // ── Traducción Modelo → datos para la Vista ───────────────────────────────
@@ -142,13 +201,14 @@ public class EstudianteController {
 
    int nuevoId = estudiantes.size() + 1; 
 
-
     Estudiante nuevoEstudiante = new Estudiante(nuevoId, nombre, carrera, promedio);
    
     estudiantes.add(nuevoEstudiante);
+    
+    // Actualizamos la memoria de últimos resultados para incluir al nuevo estudiante
+    ultimosResultados = new ArrayList<>(estudiantes);
 
-    //  Actualizamos la interfaz: Mostramos un mensaje de éxito (si tu vista lo tiene)
-    // y refrescamos la tabla con toda la lista actualizada
+    // Actualizamos la interfaz: Mostramos un mensaje de éxito y refrescamos la tabla con toda la lista actualizada
     vista.mostrarConfirmacion("Estudiante agregado con éxito.");
     
     // Convertimos toda la lista a filas para que la tabla de la vista se redibuje
